@@ -1,0 +1,14 @@
+{
+    "tests": [
+        {
+            "name": "getLogin",
+            "setup": "",
+            "run": "npm run test",
+            "input": "",
+            "output": "",
+            "comparison": "included",
+            "timeout": 1,
+            "points": 3
+        }
+    ]
+}
