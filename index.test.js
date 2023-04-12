@@ -31,38 +31,44 @@ describe('Endpoints', () => {
         });
     });
 
-    describe('POST /register', () => {
-        it('should send back success with username', async () => {
-            expect(registerResponse.status).toBe(200);
-            expect(registerResponse.text).toBe('successfully created user bobbysmiles');
+    describe("POST /register", () => {
+        it("should send back created with the user", async () => {
+            expect(registerResponse.status).toBe(201);
+            expect(registerResponse.body).toEqual(
+                expect.objectContaining({
+                    username: testUserData.username,
+                })
+            );
         });
-        it('should create user with username', async () => {
-            const foundUser = await User.findOne({ where: { username: 'bobbysmiles' } });
+        it("should create user with username", async () => {
+            const foundUser = await User.findOne({ where: { username: "bobbysmiles" } });
             expect(foundUser).toBeTruthy();
-            expect(foundUser.username).toBe('bobbysmiles');
+            expect(foundUser.username).toBe("bobbysmiles");
         });
-        it('should hash password', async () => {
-            const foundUser = await User.findOne({ where: { username: 'bobbysmiles' } });
+        it("should hash password", async () => {
+            const foundUser = await User.findOne({ where: { username: "bobbysmiles" } });
             expect(foundUser).toBeTruthy();
             expect(foundUser.password).not.toBe(testUserData.password);
             expect(foundUser.password).toEqual(expect.stringMatching(/^\$2[ayb]\$.{56}$/));
         });
     });
 
-    describe('POST /login', () => {
-        it('should send back success with username', async () => {
+    describe("POST /login", () => {
+        it("should send back success with username", async () => {
             expect(loginResponse.status).toBe(200);
-            expect(loginResponse.text).toBe('successfully logged in user bobbysmiles');
+            expect(loginResponse.body).toEqual({ message: "Successfully signed in!" });
         });
-        it('if password incorrect, should send back 401 unauthorized, with message', async () => {
+        it("if password incorrect, should send back 401 unauthorized, with message", async () => {
             const incorrectLoginResponse = await request(app)
-                .post('/login')
+                .post("/login")
                 .send({
-                    username: 'bobbysmiles',
-                    password: 'notright'
+                    username: "bobbysmiles",
+                    password: "notright",
                 })
                 .catch(err => console.error(err));
-            expect(incorrectLoginResponse.text).toBe('incorrect username or password');
+            expect(incorrectLoginResponse.body).toEqual({
+                message: "Invalid username and/or password",
+            });
         });
     });
 });
