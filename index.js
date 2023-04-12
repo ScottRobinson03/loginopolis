@@ -6,16 +6,19 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 app.get('/', async (req, res, next) => {
-  try {
-    res.send('<h1>Welcome to Loginopolis!</h1><p>Log in via POST /login or register via POST /register</p>');
-  } catch (error) {
-    console.error(error);
-    next(error)
-  }
+    try {
+        res.send(
+            "<h1>Welcome to Loginopolis!</h1><p>Log in via POST /login or register via POST /register</p>"
+        );
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 });
 
 // POST /register
 // TODO - takes req.body of {username, password} and creates a new user with the hashed password
+
 
 // POST /login
 // TODO - takes req.body of {username, password}, finds user by username, and compares the password with the hashed version from the DB
