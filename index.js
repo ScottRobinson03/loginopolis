@@ -22,16 +22,17 @@ app.get("/", async (req, res, next) => {
 app.post("/register", async (req, resp) => {
     const { username, password } = req.body;
 
-    if (!(username && password)) resp.status(400).send("missing username and/or password");
+    if (!(username && password))
+        resp.status(400).json({ message: "Missing username and/or password" });
 
     const salt_length = Math.max(2, Math.floor(Math.random() * 10)); // randint 2-10 inclusive
     const hash = await bcrypt.hash(password, salt_length);
     try {
-        await User.create({ username, password: hash });
-        resp.send(`successfully created user ${username}`);
+        const createdUser = await User.create({ username, password: hash });
+        resp.status(201).json(createdUser.toJSON());
     } catch (exc) {
         console.error(exc);
-        resp.status(500).send(exc.toString());
+        resp.status(500).json({ message: exc.toString() });
     }
 });
 
@@ -40,7 +41,8 @@ app.post("/register", async (req, resp) => {
 app.post("/login", async (req, resp) => {
     const { username, password } = req.body;
 
-    if (!(username && password)) resp.status(400).send("missing username and/or password");
+    if (!(username && password))
+        resp.status(400).json({ message: "Missing username and/or password" });
 
     const retrievedUser = await User.findOne({ where: { username } });
     const storedHash = retrievedUser?.password;
@@ -48,13 +50,13 @@ app.post("/login", async (req, resp) => {
     const isSame = await bcrypt.compare(password, storedHash ?? "a-fake-hash");
     if (storedHash === undefined) {
         // Username wasn't found. Note that we still compare hashes to prevent timing attacks
-        resp.status(401).send("incorrect username or password");
+        resp.status(401).json({ message: "Invalid username and/or password" });
     } else if (isSame) {
         // Password is correct
-        resp.send(`successfully logged in user ${username}`);
+        resp.json({ message: "Successfully signed in!" });
     } else {
         // Password is wrong
-        resp.status(401).send("incorrect username or password");
+        resp.status(401).json({ message: "Invalid username and/or password" });
     }
 });
 
